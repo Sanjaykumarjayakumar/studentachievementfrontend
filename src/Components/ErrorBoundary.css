@@ -1,0 +1,41 @@
+.ui-error {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  color: #0f172a;
+}
+
+.ui-error-title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.ui-error-message {
+  margin: 0 0 16px;
+  color: #475569;
+  font-weight: 600;
+}
+
+.ui-error-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ui-error-btn {
+  border: 1px solid #1d4ed8;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.ui-error-btn.secondary {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+}
+
