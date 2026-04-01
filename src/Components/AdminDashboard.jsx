@@ -396,7 +396,7 @@ const AdminDashboard = () => {
             <div>
               <p className="admin-section-kicker">Quick actions</p>
               <h2>Go to a user group</h2>
-              <p>Open the section you need without extra clicks.</p>
+              <p>Open the section you need in the admin home page.</p>
             </div>
           </div>
           <div className="admin-pages">
