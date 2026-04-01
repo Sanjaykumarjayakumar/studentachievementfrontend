@@ -1,19 +1,33 @@
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'https://studentachievementbackend.onrender.com/api').replace(/\/$/, '');
 
 const request = async (path, options = {}) => {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    },
-    ...options
-  });
+  const url = `${API_BASE_URL}${path}`;
+  let response;
+  try {
+    response = await fetch(url, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      },
+      ...options
+    });
+  } catch (error) {
+    const networkError = new Error('Unable to reach the server. Check your internet connection and API URL.');
+    networkError.isNetworkError = true;
+    networkError.cause = error;
+    networkError.url = url;
+    throw networkError;
+  }
 
   const isJson = response.headers.get('content-type')?.includes('application/json');
   const data = isJson ? await response.json() : null;
 
   if (!response.ok) {
-    throw new Error(data?.message || `Request failed with ${response.status}`);
+    const apiError = new Error(data?.message || `Request failed with ${response.status}`);
+    apiError.status = response.status;
+    apiError.url = url;
+    apiError.data = data;
+    throw apiError;
   }
 
   return data;

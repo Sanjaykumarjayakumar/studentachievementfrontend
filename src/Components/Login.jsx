@@ -89,10 +89,25 @@ const Login = ({ onLogin }) => {
           : '/homepage'
       );
     } catch (err) {
+      const host = typeof window !== 'undefined' ? window.location.hostname : '';
       let message = err.message || 'Google login failed';
 
       if (message.toLowerCase().includes('missing firebase env values')) {
         setError('Google sign-in is not configured for this environment.');
+        return;
+      }
+
+      if (err?.code === 'auth/unauthorized-domain') {
+        setError(
+          `Google sign-in is blocked for this domain${host ? ` (${host})` : ''}. Add it in Firebase Console → Authentication → Settings → Authorized domains.`
+        );
+        return;
+      }
+
+      if (err?.code === 'auth/invalid-credential') {
+        setError(
+          `Google sign-in failed due to invalid credentials. This usually means the Firebase OAuth configuration is incorrect for this domain${host ? ` (${host})` : ''}.`
+        );
         return;
       }
 
@@ -117,10 +132,13 @@ const Login = ({ onLogin }) => {
       }
       
       // Handle network/Firebase errors
-      if (message.toLowerCase().includes('failed') || 
-          message.toLowerCase().includes('network') ||
-          message.toLowerCase().includes('timeout')) {
-        setError('Network error. Please check your connection and try again.');
+      if (
+        err?.isNetworkError ||
+        message.toLowerCase().includes('failed') ||
+        message.toLowerCase().includes('network') ||
+        message.toLowerCase().includes('timeout')
+      ) {
+        setError('Network error. Please check your connection / API URL and try again.');
         return;
       }
       
