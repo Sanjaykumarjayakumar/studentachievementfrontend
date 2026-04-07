@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithPopup } from 'firebase/auth';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { googleLogin, loginUser } from '../services/api';
 import './Login.css';
 
@@ -19,7 +20,9 @@ const Login = ({ onLogin }) => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -39,6 +42,7 @@ const Login = ({ onLogin }) => {
     }
 
     try {
+      setLoginLoading(true);
       const response = await loginUser(formData);
       onLogin(response.user);
       navigate(
@@ -50,6 +54,8 @@ const Login = ({ onLogin }) => {
       );
     } catch (err) {
       setError(err.message || 'Unable to login');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -113,10 +119,7 @@ const Login = ({ onLogin }) => {
 
       // Handle different error cases
       if (message.toLowerCase().includes('account not found')) {
-        const email = googleUser?.email ? ` (${googleUser.email})` : '';
-        setError(
-          `Account not found${email}. Google sign-in works only for student/staff accounts created with the same email. Admins must login using Admin ID + password.`
-        );
+        setError('Account not found');
         return;
       }
       
@@ -152,8 +155,8 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Student Achievement Dashboard</h1>
-          <p>Please login to your account</p>
+          <h2>Student Achievement Dashboard</h2>
+          <p>Sign in with your Email/Admin ID</p>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -161,33 +164,61 @@ const Login = ({ onLogin }) => {
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="loginId">Email or Admin ID</label>
-            <input
-              type="text"
-              id="loginId"
-              name="loginId"
-              value={formData.loginId}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="Enter email, or admin ID"
-            />
+            <div className="input-wrap">
+              <div className="input-shell">
+                <span className="input-icon-slot" aria-hidden="true">
+                  <Mail size={18} className="input-icon" />
+                </span>
+                <input
+                  type="text"
+                  id="loginId"
+                  name="loginId"
+                  value={formData.loginId}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Email/Admin ID"
+                  autoComplete="username"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="form-input"
-              placeholder="Enter your password"
-            />
+            <div className="input-wrap">
+              <div className="input-shell">
+                <span className="input-icon-slot" aria-hidden="true">
+                  <Lock size={18} className="input-icon" />
+                </span>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="form-input password-input"
+                  placeholder="Password"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+                </button>
+              </div>
+            </div>
           </div>
 
-          <button type="submit" className="btn-login">
-            Login
+          <button type="submit" className="btn-login" disabled={loginLoading}>
+            {loginLoading ? 'Logging in...' : 'Login'}
           </button>
+
+          <div className="login-divider" role="separator" aria-label="or">
+            <span>or</span>
+          </div>
 
           <button type="button" className="btn-google" onClick={handleGoogleLogin} disabled={googleLoading}>
             <GoogleIcon />

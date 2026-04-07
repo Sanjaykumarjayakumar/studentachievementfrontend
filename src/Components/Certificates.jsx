@@ -18,6 +18,11 @@ const Certificates = () => {
     certificatePdf: '',
     certificatePdfName: ''
   });
+  const isCertificateFormComplete =
+    formData.name.trim() &&
+    formData.issuingOrg.trim() &&
+    formData.issueDate &&
+    formData.certificatePdf;
 
   useEffect(() => {
     loadCertificates();
@@ -215,7 +220,7 @@ const Certificates = () => {
               <button type="button" onClick={() => setShowForm(false)} className="btn-cancel">
                 Cancel
               </button>
-              <button type="submit" className="btn-submit">
+              <button type="submit" className="btn-submit" disabled={!isCertificateFormComplete}>
                 Add Certificate
               </button>
             </div>

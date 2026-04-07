@@ -60,6 +60,27 @@ const AdminUsersPage = ({ role }) => {
         };
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
   const normalizeId = (value) => String(value || '').trim().toLowerCase();
+  const isEditPasswordValid = !editForm.password.trim() || new RegExp(`^${passwordPolicy.pattern}$`).test(editForm.password);
+  const isEditFormComplete =
+    role === 'student'
+      ? Boolean(
+          editForm.name.trim() &&
+          editForm.rollNo.trim() &&
+          editForm.email.trim() &&
+          editForm.department.trim() &&
+          editForm.year.trim() &&
+          editForm.semester.trim() &&
+          isEditPasswordValid
+        )
+      : role === 'staff'
+      ? Boolean(
+          editForm.name.trim() &&
+          editForm.staffId.trim() &&
+          editForm.email.trim() &&
+          editForm.department.trim() &&
+          isEditPasswordValid
+        )
+      : Boolean(editForm.name.trim() && isEditPasswordValid);
 
   const loadUsers = async (reset = false) => {
     try {
@@ -450,7 +471,7 @@ const AdminUsersPage = ({ role }) => {
               <button className="btn-delete" type="button" onClick={handleCloseEdit} disabled={savingEdit}>
                 Cancel
               </button>
-              <button className="btn-submit" type="button" onClick={handleSaveEdit} disabled={savingEdit}>
+              <button className="btn-submit" type="button" onClick={handleSaveEdit} disabled={savingEdit || !isEditFormComplete}>
                 {savingEdit ? 'Saving...' : 'Save'}
               </button>
             </div>

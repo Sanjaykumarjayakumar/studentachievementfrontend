@@ -18,6 +18,13 @@ const Projects = () => {
     githubUrl: '',
     image: ''
   });
+  const isProjectFormComplete =
+    formData.title.trim() &&
+    formData.description.trim() &&
+    formData.startDate &&
+    formData.endDate &&
+    formData.projectUrl.trim() &&
+    formData.githubUrl.trim();
 
   useEffect(() => {
     loadProjects();
@@ -269,7 +276,7 @@ const Projects = () => {
               <button type="button" onClick={() => setShowForm(false)} className="btn-cancel">
                 Cancel
               </button>
-              <button type="submit" className="btn-submit">
+              <button type="submit" className="btn-submit" disabled={!isProjectFormComplete}>
                 Add Project
               </button>
             </div>

@@ -17,6 +17,16 @@ const Internships = () => {
     internshipPdf: '',
     internshipPdfName: ''
   });
+  const hasInvalidInternshipDates =
+    Boolean(formData.startDate && formData.endDate) &&
+    new Date(formData.endDate) <= new Date(formData.startDate);
+  const isInternshipFormComplete =
+    formData.title.trim() &&
+    formData.company.trim() &&
+    formData.startDate &&
+    formData.endDate &&
+    formData.internshipPdf &&
+    !hasInvalidInternshipDates;
 
   useEffect(() => {
     loadInternships();
@@ -208,7 +218,7 @@ const Internships = () => {
               <button type="button" onClick={() => setShowForm(false)} className="btn-cancel">
                 Cancel
               </button>
-              <button type="submit" className="btn-submit">
+              <button type="submit" className="btn-submit" disabled={!isInternshipFormComplete}>
                 Add Internship
               </button>
             </div>

@@ -21,6 +21,12 @@ const Achievements = () => {
     achievementPdfName: '',
     achievementPdfData: ''
   });
+  const isAchievementFormComplete =
+    formData.title.trim() &&
+    formData.organizingBody.trim() &&
+    formData.date &&
+    formData.description.trim() &&
+    formData.achievementPdfData;
 
   useEffect(() => {
     loadAchievements(true);
@@ -258,7 +264,7 @@ const Achievements = () => {
               <button type="button" onClick={() => setShowForm(false)} className="btn-cancel">
                 Cancel
               </button>
-              <button type="submit" className="btn-submit">
+              <button type="submit" className="btn-submit" disabled={!isAchievementFormComplete}>
                 Add Achievement
               </button>
             </div>

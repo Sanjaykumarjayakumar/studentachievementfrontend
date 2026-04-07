@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createUserAccount, getUserStats } from '../services/api';
 import { useToast } from './ToastProvider';
-import { LayoutDashboard, Users, UsersRound, ShieldCheck, User } from 'lucide-react';
+import { AlertCircle, LayoutDashboard, Users, UsersRound, ShieldCheck, User } from 'lucide-react';
 import './AdminDashboard.css';
 
 const semesterOptionsByYear = {
@@ -66,6 +66,26 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState(() => createEmptyForm('staff'));
   const passwordPolicy = getPasswordPolicy(formData.role);
   const passwordIsValid = passwordMeetsPolicy(formData.password, formData.role);
+  const passwordHasError = formData.password.trim().length > 0 && !passwordIsValid;
+  const isCreateFormComplete =
+    formData.name.trim() &&
+    (
+      formData.role === 'admin'
+        ? formData.adminId.trim() && formData.password.trim() && passwordIsValid
+        : formData.role === 'staff'
+        ? formData.staffId.trim() &&
+          formData.email.trim() &&
+          formData.password.trim() &&
+          formData.department.trim() &&
+          passwordIsValid
+        : formData.rollNo.trim() &&
+          formData.email.trim() &&
+          formData.password.trim() &&
+          formData.department.trim() &&
+          formData.year.trim() &&
+          formData.semester.trim() &&
+          passwordIsValid
+    );
 
   const loadStats = async () => {
     try {
@@ -227,20 +247,28 @@ const AdminDashboard = () => {
                 </div>
                 <div className="field-group">
                   <label htmlFor="password">Password</label>
-                  <input
-                    id="password"
-                    className="form-input"
-                    placeholder="Enter user password"
-                    type="password"
-                    minLength={8}
-                    autoComplete="new-password"
-                    pattern={passwordPolicy.pattern}
-                    title={passwordPolicy.message}
-                    value={formData.password}
-                    onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
-                    required
-                  />
-                  <small className="field-hint">{passwordPolicy.message}</small>
+                  <div className="password-input-wrap">
+                    <input
+                      id="password"
+                      className={`form-input ${passwordHasError ? 'form-input-error' : ''}`}
+                      placeholder="Enter user password"
+                      type="password"
+                      minLength={8}
+                      autoComplete="new-password"
+                      pattern={passwordPolicy.pattern}
+                      title={passwordPolicy.message}
+                      value={formData.password}
+                      onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
+                      aria-invalid={passwordHasError}
+                      required
+                    />
+                    {passwordHasError && (
+                      <span className="password-error-icon" aria-hidden="true">
+                        <AlertCircle size={18} />
+                      </span>
+                    )}
+                  </div>
+                  {passwordHasError && <small className="field-error">{passwordPolicy.message}</small>}
                 </div>
                 <div className="field-group">
                   <label htmlFor="department">Department</label>
@@ -320,20 +348,28 @@ const AdminDashboard = () => {
                 </div>
                 <div className="field-group">
                   <label htmlFor="password">Password</label>
-                  <input
-                    id="password"
-                    className="form-input"
-                    placeholder="Enter user password"
-                    type="password"
-                    minLength={8}
-                    autoComplete="new-password"
-                    pattern={passwordPolicy.pattern}
-                    title={passwordPolicy.message}
-                    value={formData.password}
-                    onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
-                    required
-                  />
-                  <small className="field-hint">{passwordPolicy.message}</small>
+                  <div className="password-input-wrap">
+                    <input
+                      id="password"
+                      className={`form-input ${passwordHasError ? 'form-input-error' : ''}`}
+                      placeholder="Enter user password"
+                      type="password"
+                      minLength={8}
+                      autoComplete="new-password"
+                      pattern={passwordPolicy.pattern}
+                      title={passwordPolicy.message}
+                      value={formData.password}
+                      onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
+                      aria-invalid={passwordHasError}
+                      required
+                    />
+                    {passwordHasError && (
+                      <span className="password-error-icon" aria-hidden="true">
+                        <AlertCircle size={18} />
+                      </span>
+                    )}
+                  </div>
+                  {passwordHasError && <small className="field-error">{passwordPolicy.message}</small>}
                 </div>
                 <div className="field-group">
                   <label htmlFor="staffDepartment">Department</label>
@@ -369,23 +405,31 @@ const AdminDashboard = () => {
             {formData.role === 'admin' && (
               <div className="field-group">
                 <label htmlFor="password">Password</label>
-                <input
-                  id="password"
-                  className="form-input"
-                  placeholder="Enter admin password"
-                  type="password"
-                  minLength={8}
-                  autoComplete="new-password"
-                  pattern={passwordPolicy.pattern}
-                  title={passwordPolicy.message}
-                  value={formData.password}
-                  onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
-                  required
-                />
-                <small className="field-hint">{passwordPolicy.message}</small>
+                <div className="password-input-wrap">
+                  <input
+                    id="password"
+                    className={`form-input ${passwordHasError ? 'form-input-error' : ''}`}
+                    placeholder="Enter admin password"
+                    type="password"
+                    minLength={8}
+                    autoComplete="new-password"
+                    pattern={passwordPolicy.pattern}
+                    title={passwordPolicy.message}
+                    value={formData.password}
+                    onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
+                    aria-invalid={passwordHasError}
+                    required
+                  />
+                  {passwordHasError && (
+                    <span className="password-error-icon" aria-hidden="true">
+                      <AlertCircle size={18} />
+                    </span>
+                  )}
+                </div>
+                {passwordHasError && <small className="field-error">{passwordPolicy.message}</small>}
               </div>
             )}
-            <button className="btn-submit" type="submit" disabled={creating}>
+            <button className="btn-submit" type="submit" disabled={creating || !isCreateFormComplete}>
               {creating ? 'Creating...' : 'Create'}
             </button>
           </form>
